@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- This URDF was automatically created by SolidWorks to URDF Exporter! Originally created by Stephen Brawner (brawner@gmail.com) 
+     Commit Version: 1.5.1-0-g916b5db  Build Version: 1.5.7152.31018
+     For more information, please see http://wiki.ros.org/sw_urdf_exporter -->
+<robot
+  name="65mm Press-Fit Prop.SLDPRT">
+  <link
+    name="prop_CCW.URDF">
+    <inertial>
+      <origin
+        xyz="-2.3275E-08 -5.84389999794885E-10 0.0033499"
+        rpy="0 0 0" />
+      <mass
+        value="0.00030877" />
+      <inertia
+        ixx="1.0418E-09"
+        ixy="-3.7673E-12"
+        ixz="-5.83400000000023E-15"
+        iyy="5.0414E-08"
+        iyz="-3.12749999991979E-16"
+        izz="5.0545E-08" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="1.5707963267949 0 0" />
+      <geometry>
+        <mesh
+          filename="package://prop_CCW.URDF/meshes/prop_CCW.URDF.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.64706 0.64706 0.64706 1" />
+        <texture
+          filename="package://prop_CCW.URDF/textures/" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="1.5707963267949 0 0" />
+      <geometry>
+        <mesh
+          filename="package://prop_CCW.URDF/meshes/prop_CCW.URDF.STL" />
+      </geometry>
+    </collision>
+  </link>
+</robot>

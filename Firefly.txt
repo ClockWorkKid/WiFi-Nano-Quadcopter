@@ -1,0 +1,8 @@
+https://github.com/AlphaLima/ESP32-Serial-Bridge
+https://robotzero.one/esp32-camera-module/
+https://www.instructables.com/id/Build-a-WiFi-Enabled-Micro-quadrotor/
+https://opencv-python-tutroals.readthedocs.io/en/latest/py_tutorials/py_video/py_lucas_kanade/py_lucas_kanade.html
+https://robotics.stackexchange.com/questions/1844/stabilizing-a-quadcopter-with-optical-flow
+https://dronerush.com/drone-gps-10778/
+https://stackoverflow.com/questions/11217674/how-to-calculate-distance-from-wifi-router-using-signal-strength
+https://www.kalmanfilter.net/background.html
