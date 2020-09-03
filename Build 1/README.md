@@ -1,9 +1,117 @@
-Here is the detailed construction process of the first build of project Firefly:
+# Firefly Build 1
+Here is the detailed construction process of the first successful build of project Firefly:
+
+## Contents
+
+- [Materials](#materials)
+- [Circuit Connections](#circuit-connections)
+- [Flight Controller Configuration](#flight-controller-configuration)
+- [ESP8266 Configuration](#esp8266-configuration)
+- [Finalizing Setup](#finalizing-setup)
+
+## Materials
+
+- 90mm carbon fibre quadcopter frame (Any frame supporting **8520 motors** should work)
+- 8520 Coreless motors 2 pairs (cw motor has **red+black/blue** wire, ccw motor has **white+black** wire)
+- 55mm Propeller 2 pairs (Clockwise + Counterclockwise)
+- F3 Evo Brushed Flight Controller (Any **brushed** flight controller should do)
+- 600mAH 1S 3.7V lipo cell
+- WeMos D1 mini ESP8266 WiFi Module (Any ESP8266 should work)
+
+<figure align="center">
+    <img src="images/frame.jpg" alt="drawing" width="300"/>
+    <figcaption>Frame</figcaption>
+</figure>
+
+<figure align="center">
+    <img src="images/motor.jpg" alt="drawing" width="300"/>
+    <figcaption>Motor</figcaption>
+</figure>
+
+<figure align="center">
+    <img src="images/propeller.jpg" alt="drawing" width="300"/>
+    <figcaption>Propeller</figcaption>
+</figure>
+
+<figure align="center">
+    <img src="images/f3evo.jpg" alt="drawing" width="300"/>
+    <figcaption>Flight Controller</figcaption>
+</figure>
+
+<figure align="center">
+    <img src="images/lipo.jpg" alt="drawing" width="300"/>
+    <figcaption>Lipo Cell</figcaption>
+</figure>
+
+<figure align="center">
+    <img src="images/wemos.jpg" alt="drawing" width="300"/>
+    <figcaption>Wifi Module</figcaption>
+</figure>
+
+
+## Circuit Connections
+
+<figure align="center">
+    <img src="images/circuit.jpg" alt="drawing"/>
+    <figcaption>Overall Circuit Diagram</figcaption>
+</figure>
+
+<figure align="center">
+    <img src="images/f3pinout.jpg" alt="drawing" width="300">
+    <figcaption>Flight Controller pinout diagram</figcaption>
+</figure>
+
+### Step 1: Connecting Battery Connector to Flight Controller
+Watch for the polarity of the battery connector cable while connecting it to the power pins of the flight controller. A reverse battery connection can fry your controller. If you are using a 1S battery, make sure the 1S jumper is soldered together as the flight controller supports both 1S and 2S power supplies in separate modes (The connection pads are near the battery connector)
+
+<figure align="center">
+    <img src="images/voltage_selection.png" alt="drawing" width="300"/>
+    <figcaption>Voltage Selection Jumper</figcaption>
+</figure>
+<figure align="center">
+    <img src="images/battery_selection.jpg" alt="drawing" width="300"/>
+    <figcaption>Voltage Selection Jumper</figcaption>
+</figure>
+
+### Step 2: Connecting Motors to Flight Controller
+Red+Blue or Red+Black motors are designed to rotate clockwise (along with a clockwise propeller) and White+Black motors are designed for counter-clockwise rotation. For all motors, **Black means Negative** and the other colored wire is positive. F3 Evo brushed flight controller has 6 motor connections available (4 in some variants). We will connect clockwise motors (Red+Black) on connections M1, M4 and counter-clockwise motors (White+Black) on M2, M3. Watch out for the polarity of the connections, you can find them on the pinout diagram of the flight controller.
+
+### Step 3: Connecting WeMos D1 mini to Flight Controller
+F3 evo brushed flight controller has 3 UART ports, you can find the details on the <a href="https://www.unmannedtech.co.uk/uploads/6/7/0/2/6702064/f3_evo_fc_manual.pdf">user manual</a>
+
+| Serial Port   | Used For      |
+| ------------- |:-------------:|
+| UART1 | GPS/OSD |
+| UART2 | PPM/SBUS receiver input |
+| UART3 | GPS/Telemetry module |
+
+We will be using **UART2** as the ESP8266 module will be used as a PPM receiver over WiFi.
+
+<figure align="center">
+    <img src="images/wemos_pinout.png" alt="drawing" width="300"/>
+    <figcaption>Voltage Selection Jumper</figcaption>
+</figure>
+
+The code has been configured to be using GPIO5 pin on the ESP8266 module as the PPM output, which is pin D1 on WeMos D1 mini.
+
+| Flight Controller | ESP8266 pin | WeMos D1 Mini |
+| ------------- |:-------------:|:-------------:|
+| UART2 RX | GPIO5 | D1 |
+| UART2 V+| +5V input | +5V input |
+| UART2 GND | GND | GND |
+
+In this manner, the flight controller will power the ESP8266 module when connected to USB/Battery.
+
+## Flight Controller Configuration
+
+## ESP8266 Configuration
+
+## Finalizing Setup
 
 
 ## References
 - <a href="https://github.com/DipanshuShukla/ESP-PPM">ESP PPM github link</a>
-- <a href="- https://www.instructables.com/id/Build-a-WiFi-Enabled-Micro-quadrotor/">WiFi enabled micro quadrotor</a>
+- <a href="https://www.instructables.com/id/Build-a-WiFi-Enabled-Micro-quadrotor/">WiFi enabled micro quadrotor</a>
 - <a href="https://www.instructables.com/id/Long-Range-Wifi-PPM-MSP/">Long Range WiFi PPM instructables</a>
 - <a href="https://community.micro-motor-warehouse.com/t/banggood-eachine-sp-racing-f3-evo-based-brushed-fc-set-up-guide-for-spektrum-sat-receivers/2574">F3 Evo setup guide</a>
 - <a href="https://blog.dronetrest.com/setting-up-flight-modes-in-cleanflight-betaflight/">Betaflight flight modes</a>
