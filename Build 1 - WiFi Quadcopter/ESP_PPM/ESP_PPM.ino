@@ -19,7 +19,7 @@
 #define sigPin 5 //set PPM signal output pin on the arduino
 #define DEBUGPIN 4
 
-const char *ssid = "Firefly";
+const char *ssid = "Firefly_Test";
 const char *password = "987456321";
 
 volatile unsigned long next;

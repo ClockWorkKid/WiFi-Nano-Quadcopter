@@ -57,7 +57,7 @@ Here is the detailed construction process of the first successful build of proje
 </figure>
 
 <figure align="center">
-    <img src="images/f3pinout.jpg" alt="drawing" width="300">
+    <img src="images/f3pinout.jpg" alt="drawing" width="600">
     <figcaption>Flight Controller pinout diagram</figcaption>
 </figure>
 
@@ -88,8 +88,8 @@ F3 evo brushed flight controller has 3 UART ports, you can find the details on t
 We will be using **UART2** as the ESP8266 module will be used as a PPM receiver over WiFi.
 
 <figure align="center">
-    <img src="images/wemos_pinout.png" alt="drawing" width="300"/>
-    <figcaption>Voltage Selection Jumper</figcaption>
+    <img src="images/wemos_pinout.png" alt="drawing"/>
+    <figcaption>WeMos D1 Mini Pinout</figcaption>
 </figure>
 
 The code has been configured to be using GPIO5 pin on the ESP8266 module as the PPM output, which is pin D1 on WeMos D1 mini.
