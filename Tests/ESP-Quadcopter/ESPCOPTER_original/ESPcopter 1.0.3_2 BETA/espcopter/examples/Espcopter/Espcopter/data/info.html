@@ -1,0 +1,157 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>HTML Uploader</title>
+    <link href='main.css' rel='stylesheet' type='text/css'>
+    <link rel="apple-touch-icon" sizes="180x180" href="media/logo_144.png">
+    <link rel="icon" type="image/png" sizes="144x144"  href="media/logo_144.png">
+   
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#000000">
+    <meta content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0' name='viewport'>
+</head>
+<body>
+	<center>
+        <header>
+            <h1>Welcome to ESPcopter</h1>
+        </header>
+		 <div>
+			<a href="index.html"><img src="media/logo.png" width="325" height="125" title="ESPcopter Logo" alt="Flower"></a>
+        </div>
+		
+		
+		 <header>
+            <h1>General Info</h1>
+        </header>
+       
+	      <div>
+            <p style="text-align: left">Software Version:  <span id="readSfVersion">0</span>  <br/> Spiffs Version:  <span id="readSpVersion">0</span> </p>    
+        </div> 
+		
+		 <header>
+            <h1>How to Update </h1>
+        </header>
+       
+	      <div>
+            <p style="text-align: left"> You can use following link: <br/> http://espcopter.com/code-release/ </p>    
+        </div>
+	     
+		  <header>
+            <h1>Company Info</h1> 
+        </header>
+		 <div>
+			<a href="index.html"><img src="media/c_logo.png" width="325" height="70" title="ESPcopter Logo" alt="Flower"></a>
+       <p style="text-align: center">Ozyegin University, Cekmekoy Campus </p>    
+	   </div>
+	   
+	    <header>
+            <h1>Contact Info</h1> 
+        </header>
+            <div>	
+       <p style="text-align: left">  Adress: Ozyegin University, Cekmekoy Campus <br/> Nisantepe District, Orman Street, 34794 Cekmekoy - ISTANBUL  <br/> <br/>  Mail: espcopter@gmail.com </p>    
+	   </div> 
+		
+		<header>
+            <h1>Have any questions?</h1> 
+        </header>
+		   <div>	
+       <p style="text-align: left"> 
+		For more information,visit our community site at http://espcopter.com/community/ or ask us
+		in our Facebook group (Link below)!
+		<br/><br/>
+		Facebook Group: https://www.facebook.com/groups/1055252907941836/
+
+	   </p>    
+	   </div> 
+	   
+	   
+	   <header>
+         <h1>Our Social Accounts</h1> 
+        </header>
+		  <div>	
+       <p style="text-align: left"> 
+		Like and Follow us:
+		<br/><br/>
+		Facebook: https://www.facebook.com/espcopter/
+		Website:  http://espcopter.com/
+		Twitter:  https://twitter.com/ESPcopter
+		Instagram:https://www.instagram.com/espcopter/
+
+	   </p>    
+	    <div>
+			
+        </div>
+		
+		  <script> 
+			  	
+		  	
+	var wsconnect = 0;
+   
+	
+    var Socket = new WebSocket('ws://' + location.hostname + ':81/', ['arduino']);
+	
+	Socket.onopen = function () {
+    Socket.send('Connect ' + new Date());
+	console.log("Websocket Open");
+	wsconnect = 1;
+	};
+	
+	
+	Socket.onerror = function (error) {
+    console.log('WebSocket Error ', error);
+	wsconnect = 0;
+	};
+	Socket.onmessage = function (e) {  
+    console.log("indata: " + e);
+	};
+	Socket.onclose = function(){
+    console.log("Websocket close");
+     wsconnect=0;
+	};	
+	
+	function send_message(msg){
+	 Socket.send(msg);
+	}		
+		  
+		  
+		  
+	setInterval(function() {
+	// Call a function repetatively with 2 Second interval
+	console.log("request data");
+	getData("readSfVersion");
+	getData("readSpVersion");
+	}, 2000); //2000mSeconds update rate
+ 
+		  
+		 	
+
+
+function getData(data) {
+  var xhttp = new XMLHttpRequest();
+  xhttp.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 200) {
+    console.log(data + " , " + this.responseText);
+	if( data == "readSfVersion" ){
+	document.getElementById("readSfVersion").innerHTML = this.responseText;
+		console.log( " readSfVersion: " + this.responseText);
+	}
+	if( data == "readSpVersion" ){
+	document.getElementById("readSpVersion").innerHTML = this.responseText;
+		console.log( " readSpVersion: " + this.responseText);
+	}
+
+	
+	}
+  };
+  xhttp.open("GET", data, true);
+  xhttp.send();
+}
+
+		
+	
+	</script>				 
+	</center>
+</body>
+</html>
+

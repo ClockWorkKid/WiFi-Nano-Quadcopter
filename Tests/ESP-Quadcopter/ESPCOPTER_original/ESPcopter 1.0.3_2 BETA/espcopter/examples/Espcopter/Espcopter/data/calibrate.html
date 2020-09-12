@@ -1,0 +1,137 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>HTML Uploader</title>
+    <link href='main.css' rel='stylesheet' type='text/css'>
+    <link rel="apple-touch-icon" sizes="180x180" href="media/logo_144.png">
+    <link rel="icon" type="image/png" sizes="144x144"  href="media/logo_144.png">
+   
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#000000">
+    <meta content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0' name='viewport'>
+</head>
+<body>
+	<center>
+        <header>
+            <h1>Welcome to ESPcopter</h1>
+        </header>
+		 <div>
+			<a href="deneme.html"><img src="media/logo.png" width="325" height="125" title="ESPcopter Logo" alt="Flower"></a>
+        </div>
+		
+		
+		 <header>
+            <h2>Calibration Of The ESPcopter</h2>
+        </header>
+		
+        <div>
+		<p style="text-align: middle">
+		Drones such as the ESPcopter and other drones have a number of 
+		built-in sensors and devices that enable stable and smooth flight. In 
+		order for these to function properly, it is necessary to calibrate them 
+		from time to time. On this page, we will make Gyro and Accelerometer and Magnetometer calibration.
+		</p>
+        
+			  
+	    </div>
+		
+		<header>
+            <h2>Gyro and Accelerometer Calibration</h2>
+        </header>
+		
+         <div>
+		<p style="text-align: left">
+		Step 1. Put ESPcopter on the flat surface
+		<br/>Step 2. Click to Ok button 
+		<br/>Step 3. Do not touch to ESPcopter, When blue led on 
+		<br/>Step 4. Calibration is done, When green led on 
+		</p>
+         
+		 <div>
+			<a href="deneme.html"><img src="media/drone.png" width="300" height="200" title="ESPcopter Logo" alt="Flower"></a>
+        </div>
+			
+		<p style="margin:8px 0px"><button id="rainbow" class="button" style="background-color:#999" onclick="gyro();">Ok</button></p>
+     
+			  
+	    </div>
+		
+		<header>
+            <h2>Magnetometer Calibration</h2>
+        </header>
+		
+         <div>
+	   
+			<p style="text-align: left">
+			Step 1. Put ESPcopter on the flat surface
+			<br/>Step 2. Click to Ok button 
+			<br/>Step 3. Rotate ESPcopter Two Times, When blue led on 
+			<br/>Step 4. Do not touch to ESPcopter, When blue and green led on 
+			</p>
+             
+			 
+			<div>
+			<a href="deneme.html"><img src="media/drone.png" width="300" height="200" title="ESPcopter Logo" alt="Flower"></a>
+			</div>
+			 
+			 
+			 <p style="margin:8px 0px"><button id="rainbow" class="button" style="background-color:#999" onclick="accel();">Ok</button></p>
+     
+	 
+	    </div>
+		
+		
+		
+	 <script>  
+		  
+		  	
+	var wsconnect = 0;
+   
+	
+    var Socket = new WebSocket('ws://' + location.hostname + ':81/', ['arduino']);
+
+	
+	Socket.onopen = function () {
+    Socket.send('Connect ' + new Date());
+	console.log("Websocket Open");
+	wsconnect = 1;
+	};
+	
+	
+	Socket.onerror = function (error) {
+    console.log('WebSocket Error ', error);
+	wsconnect = 0;
+	};
+	Socket.onmessage = function (e) {  
+    console.log("indata: " + e);
+	};
+	Socket.onclose = function(){
+    console.log("Websocket close");
+     wsconnect=0;
+	};	
+	
+	function send_message(msg){
+	 Socket.send(msg);
+	}		
+		  
+		  
+		  	  
+    function gyro() {
+	 var props = '{"cal":' + "0" +'}';
+	 send_message(props); 
+	 console.log( props);
+    }
+	
+	function accel() {
+	  var props = '{"cal":' + "1" +'}';
+	  send_message(props); 
+	  console.log(props);
+    }
+		  
+	
+	</script>				 
+	</center>
+</body>
+</html>
+

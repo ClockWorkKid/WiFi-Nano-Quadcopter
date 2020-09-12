@@ -1,0 +1,799 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Blockly Demo: Asynchronous Execution with JS Interpreter</title>
+  <link rel="folder" href="/media">
+  <link rel="icon" type="image/png" sizes="96x124"  href="/sprites.png">
+  <script src="acorn_interpreter.js"></script>
+  <script src="blockly_compressed.js"></script>
+  <script src="blocks_compressed.js"></script>
+  <script src="javascript_compressed.js"></script>
+  <script src="en.js"></script>
+  <script src="wait_block.js"></script>
+  <script src="flight02.js"></script>
+  <style>
+    body {
+      background-color: #fff;
+      font-family: sans-serif;
+    }
+    h1 {
+      font-weight: normal;
+      font-size: 140%;
+    }
+  </style>
+</head>
+<body>
+  <h1>ESPcopter Blockly Programing Beta 1.0.0 </h1>
+
+  <p>This is a demo of executing code to ESPcopter.</p>
+
+  <p>&rarr; <a href="wwww.espcopter.com/learn">More info on ESPcopter Programing</a></p>
+
+  
+  <p>
+    <button onclick="runCode()" id="runButton">Run Your Code</button>
+  </p>
+
+  <div style="width: 100%">
+    <div id="blocklyDiv"
+        style="display: inline-block; height: 480px; width: 58%"></div>
+    <textarea id="output" disabled="disabled"
+        style="display: inline-block; height: 480px; width: 38%;">
+    </textarea>
+  </div>
+
+  <xml id="toolbox" style="display: none">
+   <category name="Logic" colour="%{BKY_LOGIC_HUE}">
+      <category name="If">
+        <block type="controls_if"></block>
+        <block type="controls_if">
+          <mutation else="1"></mutation>
+        </block>
+        <block type="controls_if">
+          <mutation elseif="1" else="1"></mutation>
+        </block>
+      </category>
+      <category name="Boolean" colour="%{BKY_LOGIC_HUE}">
+        <block type="logic_compare"></block>
+        <block type="logic_operation"></block>
+        <block type="logic_negate"></block>
+        <block type="logic_boolean"></block>
+        <block type="logic_null"></block>
+        <block type="logic_ternary"></block>
+      </category>
+    </category>
+    <category name="Loops" colour="%{BKY_LOOPS_HUE}">
+      <block type="controls_repeat_ext">
+        <value name="TIMES">
+          <block type="math_number">
+            <field name="NUM">10</field>
+          </block>
+        </value>
+      </block>
+      <block type="controls_whileUntil"></block>
+      <block type="controls_for">
+        <field name="VAR">i</field>
+        <value name="FROM">
+          <block type="math_number">
+            <field name="NUM">1</field>
+          </block>
+        </value>
+        <value name="TO">
+          <block type="math_number">
+            <field name="NUM">10</field>
+          </block>
+        </value>
+        <value name="BY">
+          <block type="math_number">
+            <field name="NUM">1</field>
+          </block>
+        </value>
+      </block>
+      <block type="controls_forEach"></block>
+      <block type="controls_flow_statements"></block>
+    </category> 
+		<category name="Flight" colour="%{BKY_LISTS_HUE}">	 
+		<block type="take_off"></block>	
+		<block type="land"></block>	
+		<block type="set_altitude"></block>	
+		<block type="go_forward"></block>	
+		<block type="go_back"></block>	
+		<block type="go_left"></block>	
+		<block type="go_right"></block>	
+		<block type="yaw_right"></block>
+		<block type="yaw_left"></block>				
+		</category>
+		<category name="Flight Control" colour="%{BKY_LISTS_HUE}">	 
+		<block type="arm"></block>	
+		<block type="thorttle"></block>	
+        <block type="wait_seconds"></block>			
+		<block type="trim"></block>			
+		<block type="yaw_control"></block>	
+		<block type="altitude_control"></block>	
+		<block type="optical_flow_control"></block>	
+		</category>
+		<category name="Input" colour="%{BKY_LISTS_HUE}">	 	
+		<block type="read_battery"></block>
+		<block type="get_accel"></block>
+		<block type="get_gyro"></block>
+		<block type="get_yaw"></block>
+		<block type="get_tmp"></block>
+		</category>
+	    <category name="Output" colour="%{BKY_LISTS_HUE}">	 
+		<block type="debug"></block>	
+		<block type="set_led"></block>	 
+		<block type="set_motor"></block>	 		
+		</category>
+		<category name="Modules" colour="%{BKY_LISTS_HUE}">	 
+	    
+		<category name="Optical Flow" colour="%{BKY_LISTS_HUE}">	 
+		<block type="optical_alt"></block>	
+		<block type="optical_x"></block>	
+		<block type="optical_y"></block>			
+		</category>
+		
+		<category name="Multi Ranger" colour="%{BKY_LISTS_HUE}">	 
+		<block type="multiranger_x1"></block>
+		<block type="multiranger_x"></block>
+		<block type="multiranger_y1"></block>
+		<block type="multiranger_y"></block>
+		</category>
+		
+		<category name="Neopixel" colour="%{BKY_LISTS_HUE}">	 
+        <block type="rgb_module"></block>	 
+		</category>
+		
+		<category name="Buzzer" colour="%{BKY_LISTS_HUE}">	 	
+		<block type="buzzer_on_off"></block>
+		<block type="buzzer"></block>
+		</category>
+		
+		<category name="Pressure, Temperature, Humidity " colour="%{BKY_LISTS_HUE}">	 
+		<block type="bme280_p"></block>
+		<block type="bme280_t"></block>
+		<block type="bme280_h"></block>
+		</category>
+		
+		</category>
+		
+		
+    <category name="Math" colour="%{BKY_MATH_HUE}">
+      <block type="math_number">
+        <field name="NUM">123</field>
+      </block>
+      <block type="math_arithmetic"></block>
+      <block type="math_single"></block>
+      <block type="math_trig"></block>
+      <block type="math_constant"></block>
+      <block type="math_number_property"></block>
+      <block type="math_round"></block>
+      <block type="math_on_list"></block>
+      <block type="math_modulo"></block>
+	  <block type="math_constrain">
+        <value name="LOW">
+          <block type="math_number">
+            <field name="NUM">1</field>
+          </block>
+        </value>
+        <value name="HIGH">
+          <block type="math_number">
+            <field name="NUM">100</field>
+          </block>
+        </value>
+      </block>
+	  <block type="math_random_int">
+        <value name="FROM">
+          <block type="math_number">
+            <field name="NUM">1</field>
+          </block>
+        </value>
+        <value name="TO">
+          <block type="math_number">
+            <field name="NUM">100</field>
+          </block>
+        </value>
+      </block>
+	  <block type="math_random_float"></block>
+    </category>
+	
+	
+    <category name="Text" colour="%{BKY_TEXTS_HUE}">
+      <block type="text"></block>
+      <block type="text_length"></block>
+      <block type="text_print"></block>
+      <block type="text_prompt_ext">
+        <value name="TEXT">
+          <block type="text"></block>
+        </value>
+      </block>
+    </category>
+    <sep></sep>
+    <category name="Variables" custom="VARIABLE" colour="%{BKY_VARIABLES_HUE}">
+    </category>
+    <category name="Functions" custom="PROCEDURE" colour="%{BKY_PROCEDURES_HUE}">
+    </category>
+  </xml>
+
+  <xml id="startBlocks" style="display: none">
+        <block type="controls_repeat_ext" id="repeat" inline="true">
+          <value name="TIMES">
+            <block type="math_number">
+              <field name="NUM">3</field>
+            </block>
+          </value>
+          <statement name="DO">
+            <block type="wait_seconds" id="wait">
+              <field name="SECONDS">1.0</field>               
+                  </next>
+                </block>
+              </next>
+            </block>
+          </statement>
+        </block>
+      </next>
+    </block>
+  </xml>
+  
+
+  <script>  
+	
+	
+	var wsconnect = 0;
+    var battery = 0;
+	var ImuTemp = 0;
+	
+	var altitude = 0;
+	
+	var readBme280H =0;
+	var readBme280T =0;
+	var readBme280P =0;
+	
+	var debug =0;
+	
+	var readMultiRangerX0 =0;
+	var readMultiRangerX1 =0;
+	var readMultiRangerY0 =0;
+	var readMultiRangerY1 =0;
+	
+	var readOptX =0;
+	var readOptY =0;
+	
+	var readAccelX =0;
+	var readAccelY =0;
+	var readAccelZ =0;
+	
+	var readGyroX =0;
+	var readGyroY =0;
+	var readGyroZ =0;
+  
+	
+
+    var Socket = new WebSocket('ws://' + location.hostname + ':81/', ['arduino']);
+	
+	Socket.onopen = function () {
+    Socket.send('Connect ' + new Date());
+	console.log("Websocket Open");
+	wsconnect = 1;
+	};
+	
+	
+	Socket.onerror = function (error) {
+    console.log('WebSocket Error ', error);
+	wsconnect = 0;
+	};
+	Socket.onmessage = function (e) {  
+   // console.log("indata: " + e);
+    console.log("indata: ");
+	};
+	Socket.onclose = function(){
+    console.log("Websocket close");
+     wsconnect=0;
+	};
+
+
+	function send_message(msg){
+	Socket.send(msg);
+	}
+	
+	
+	/*setInterval(function() {
+	// Call a function repetatively with 2 Second interval
+	getData("readBattery");
+	}, 2000); //2000mSeconds update rate
+ */
+ 
+
+function getData(data) {
+  var xhttp = new XMLHttpRequest();
+  xhttp.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 200) {
+    console.log(data + " , " + this.responseText);
+	
+	if( data == "readBattery" ){
+	battery = parseFloat(this.responseText);
+	}
+	if( data == "readImuTemp" ){
+	ImuTemp = parseFloat(this.responseText);
+	}
+	
+	if( data == "readBme280H" ){
+	readBme280H = parseFloat(this.responseText);
+	}
+	if( data == "readBme280T" ){
+	readBme280T = parseFloat(this.responseText);
+	}
+	if( data == "readBme280P" ){
+	readBme280P = parseFloat(this.responseText);//debug
+	} // readAltitude
+	if( data == "readAltitude" ){
+	altitude = parseFloat(this.responseText);
+	}
+		
+	if( data == "debug" ){
+	debug = this.responseText;
+	}
+	
+	if( data == "readMultiRangerX0" ){
+	readMultiRangerX0 = this.responseText;
+	}
+	if( data == "readMultiRangerX1" ){
+	readMultiRangerX1 = this.responseText;
+	}
+	if( data == "readMultiRangerY0" ){
+	readMultiRangerY0 = this.responseText;
+	}
+	if( data == "readMultiRangerY1" ){
+	readMultiRangerY1 = this.responseText;
+	}
+	
+	if( data == "readOptX" ){
+	readOptX = this.responseText;
+	}
+	
+	if( data == "readOptY" ){
+	readOptY = this.responseText;
+	}
+	
+	if( data == "readAccelX" ){
+	readAccelX = this.responseText;
+	}
+	if( data == "readAccelY" ){
+	readAccelY = this.responseText;
+	}
+	if( data == "readAccelZ" ){
+	readAccelZ = this.responseText;
+	}
+	
+	if( data == "readGyroX" ){
+	readGyroX = this.responseText;
+	}
+	if( data == "readGyroY" ){
+	readGyroY = this.responseText;
+	}
+	if( data == "readGyroZ" ){
+	readGyroZ = this.responseText;
+	}
+	
+	
+	
+	
+	}
+  };
+  xhttp.open("GET", data, true);
+  xhttp.send();
+}
+
+ 
+ 
+	
+  
+    var demoWorkspace = Blockly.inject('blocklyDiv',
+        {media:'media/',
+         toolbox: document.getElementById('toolbox')});
+    Blockly.Xml.domToWorkspace(document.getElementById('startBlocks'),
+                               demoWorkspace);
+    // Exit is used to signal the end of a script.
+    Blockly.JavaScript.addReservedWords('exit');
+    var outputArea = document.getElementById('output');
+    var runButton = document.getElementById('runButton');
+    var myInterpreter = null;
+    var runner;
+    function initApi(interpreter, scope) {
+      // Add an API function for the alert() block, generated for "text_print" blocks.
+	    
+		wrapper = function(pin1,pin2,pin3,pin4) {
+	    outputArea.value = outputArea.value + '\n'  + " RGB Module " + pin1 + "  "+ pin2 + "  " + pin3 + "  " + pin4;
+		var props = '{"rgbM":[' + pin1+ ','+ pin2+ ','+ pin3 +','+ pin4 +']}';; // {"trimXYZ":[100,100,100]}
+	    send_message(props); 
+		};
+		interpreter.setProperty(scope, 'rgbM',
+        interpreter.createNativeFunction(wrapper));
+		
+		
+		wrapper = function(pin1,pin2,pin3) {
+	    outputArea.value = outputArea.value + '\n'  + " trim " + pin1 + "  "+ pin2 + "  " + pin3  ;
+		var props = '{"trimXYZ":[' + pin1+ ','+ pin2+ ','+ pin3 +']}';; // {"trimXYZ":[100,100,100]}
+	    send_message(props); 
+		};
+		interpreter.setProperty(scope, 'trim',
+        interpreter.createNativeFunction(wrapper));
+		
+	    wrapper = function(pin) {
+	    outputArea.value = outputArea.value + '\n'  + " optical_flow_control  " + pin  ;
+		var props = '{"mode3":' + pin+'}'; // "{"arm":2}"
+	    send_message(props);
+		};
+		interpreter.setProperty(scope, 'optical_flow_control',
+        interpreter.createNativeFunction(wrapper)); 
+	    wrapper = function(pin) {
+	    outputArea.value = outputArea.value + '\n'  + " altitude_control  " + pin  ;
+		var props = '{"mode2":' + pin+'}'; // "{"arm":2}"
+	    send_message(props);
+		};
+		interpreter.setProperty(scope, 'altitude_control',
+        interpreter.createNativeFunction(wrapper)); 
+	  wrapper = function(pin) {
+	    outputArea.value = outputArea.value + '\n'  + " yaw Control  " + pin  ;
+		var props = '{"mode1":' + pin+'}'; // "{"arm":2}"
+	    send_message(props);
+		};
+		interpreter.setProperty(scope, 'yaw_control',
+        interpreter.createNativeFunction(wrapper)); 
+		wrapper = function(pin) {
+	    outputArea.value = outputArea.value + '\n'  + " set_altitude  " + pin  ;
+		var props = '{"setAltitude":' + pin +'}'; // {"throttle":102}
+	    send_message(props); 
+		};
+	    interpreter.setProperty(scope, 'set_altitude',
+        interpreter.createNativeFunction(wrapper));
+	    wrapper = function(pin) {
+	    outputArea.value = outputArea.value + '\n'  + " thorttle  " + pin  ;
+		var props = '{"throttle":' + pin+'}'; // {"throttle":102}
+	    send_message(props); 
+		};
+	   interpreter.setProperty(scope, 'thorttle',
+       interpreter.createNativeFunction(wrapper));
+	   
+	   
+	   wrapper = function(pin) {
+	    outputArea.value = outputArea.value + '\n'  + " Arm Control  " + pin  ;
+		var props = '{"arm":' + pin+'}'; // "{"arm":2}"
+	    send_message(props);
+		};
+		interpreter.setProperty(scope, 'arm',
+      interpreter.createNativeFunction(wrapper));
+	  
+	  
+	    wrapper = function(pin) {
+	    outputArea.value = outputArea.value + '\n'  + " Buzzer " + pin ;
+		var props = '{"buzzer":' + pin+'}'; // "{"arm":2}"
+	    send_message(props);
+		};
+		interpreter.setProperty(scope, 'buzzer_on_off',
+        interpreter.createNativeFunction(wrapper));
+	  
+		
+		
+		wrapper = function(pin) {
+		var data;
+		if( 0 == pin){
+		getData("readGyroX");
+		data = parseFloat(readGyroX);
+		}else if( 1 == pin){
+		getData("readGyroY");
+		data = parseFloat(readGyroY);
+		}else{
+		getData("readGyroZ");
+		data = parseFloat(readGyroZ);
+		}
+		return data;
+	    };
+	    interpreter.setProperty(scope, 'get_gyro',
+        interpreter.createNativeFunction(wrapper));
+		
+		
+		
+		wrapper = function(pin) {
+		var data;
+		if( 0 == pin){
+		getData("readAccelX");
+		data = parseFloat(readAccelX);
+		}else if( 1 == pin){
+		getData("readAccelY");
+		data = parseFloat(readAccelY);
+		}else{
+		getData("readAccelZ");
+		data = parseFloat(readAccelZ);
+		}
+		return data;
+	    };
+	    interpreter.setProperty(scope, 'get_accel',
+        interpreter.createNativeFunction(wrapper));
+	
+	
+	
+	    wrapper = function() {
+		getData("readOptY");
+		return parseFloat(readOptY);
+	    };
+	    interpreter.setProperty(scope, 'optical_y',
+        interpreter.createNativeFunction(wrapper));
+		
+	 
+	    wrapper = function() {
+		getData("readOptX");
+		return parseFloat(readOptX);
+	    };
+	    interpreter.setProperty(scope, 'optical_x',
+        interpreter.createNativeFunction(wrapper));
+		
+	  
+	    wrapper = function() {
+		getData("readImuTemp");
+		return parseFloat(ImuTemp);
+	    };
+	    interpreter.setProperty(scope, 'get_tmp',
+        interpreter.createNativeFunction(wrapper));
+		
+	  
+	  
+	    wrapper = function() {
+		getData("readMultiRangerY0");
+		return parseFloat(readMultiRangerY0);
+	    };
+	    interpreter.setProperty(scope, 'multiranger_y',
+        interpreter.createNativeFunction(wrapper));
+		
+		
+	    wrapper = function() {
+		getData("readMultiRangerY1");
+		return parseFloat(readMultiRangerY1);
+	    };
+	    interpreter.setProperty(scope, 'multiranger_y1',
+        interpreter.createNativeFunction(wrapper));
+		
+		wrapper = function() {
+		getData("readMultiRangerX0");
+		return parseFloat(readMultiRangerX0);
+	    };
+	    interpreter.setProperty(scope, 'multiranger_x',
+        interpreter.createNativeFunction(wrapper));
+		
+		 wrapper = function() {
+		getData("readMultiRangerX1");
+		return parseFloat(readMultiRangerX1);
+	    };
+	    interpreter.setProperty(scope, 'multiranger_x1',
+        interpreter.createNativeFunction(wrapper));
+		
+		
+		
+		
+		
+	    wrapper = function() {
+		getData("readBme280T");
+		return parseFloat(readBme280T);
+	    };
+	    interpreter.setProperty(scope, 'bme280_t',
+        interpreter.createNativeFunction(wrapper));
+		
+		 wrapper = function() {
+		getData("readBme280H");
+		return parseFloat(readBme280H);
+	    };
+	    interpreter.setProperty(scope, 'bme280_h',
+        interpreter.createNativeFunction(wrapper));
+		
+		
+	  
+	    wrapper = function() {
+		getData("readImuTemp");
+		return parseFloat(ImuTemp);
+	    };
+	    interpreter.setProperty(scope, 'get_tmp',
+        interpreter.createNativeFunction(wrapper));
+		
+		
+		wrapper = function() {
+		getData("debug");
+		return debug;
+	    };
+	    interpreter.setProperty(scope, 'debug',
+        interpreter.createNativeFunction(wrapper));
+		
+		
+	  
+	    wrapper = function() {
+		getData("readBattery");
+		return parseInt(battery);
+	    };
+	    interpreter.setProperty(scope, 'set_battert',
+        interpreter.createNativeFunction(wrapper));
+		
+		wrapper = function() {
+		getData("readAltitude");
+		return parseInt(altitude);
+	    };
+	    interpreter.setProperty(scope, 'read_altitude',
+        interpreter.createNativeFunction(wrapper));
+		
+	    wrapper = function(pin, setting) {
+	    outputArea.value = outputArea.value + '\n'  + " set_led " + pin  + "  " +setting;
+        var props = '{"setLed":[' + pin+ ','+ setting+']}';; // {"trimXYZ":[100,100]}
+	    send_message(props); 
+		};
+		interpreter.setProperty(scope, 'set_led',
+        interpreter.createNativeFunction(wrapper));
+		
+		wrapper = function(pin, setting) {
+	    outputArea.value = outputArea.value + '\n'  + " set_motor " + pin  + "  " +setting;
+        var props = '{"setMotor":[' + pin+ ','+ setting+']}';; // {"setMotor":[100,100]}
+	    send_message(props); 
+		console.log(" setMotor " +props);
+		};
+		interpreter.setProperty(scope, 'set_motor',
+        interpreter.createNativeFunction(wrapper));
+		
+		
+	    wrapper = function(pin) {
+	    outputArea.value = outputArea.value + '\n'  + " yaw_left " + pin  ;
+		var props = '{"turnLeft":' + pin +'}'; // {"throttle":102}
+	    send_message(props); 
+		};
+		interpreter.setProperty(scope, 'yaw_left',
+      interpreter.createNativeFunction(wrapper));
+	    wrapper = function(pin) {
+	    outputArea.value = outputArea.value + '\n'  + " yaw_right " + pin  ;
+		var props = '{"turnRight":' + pin +'}'; // {"throttle":102}
+	    send_message(props); 
+		};
+		interpreter.setProperty(scope, 'yaw_right',
+      interpreter.createNativeFunction(wrapper));
+	    wrapper = function(pin,drop) {
+	    outputArea.value = outputArea.value + '\n'  + " go_right " + pin +" " + drop ;
+		var props = '{"goRight":' + pin +'}'; // {"throttle":102}
+	    send_message(props); 
+		};
+		interpreter.setProperty(scope, 'go_right',
+      interpreter.createNativeFunction(wrapper));
+	   wrapper = function(pin,drop) {
+	    outputArea.value = outputArea.value + '\n'  + " go_left " + pin +" " + drop ;
+		var props = '{"goLeft":' + pin +'}'; // {"throttle":102}
+	    send_message(props); 
+		};
+		interpreter.setProperty(scope, 'go_left',
+      interpreter.createNativeFunction(wrapper));
+	   wrapper = function(pin,drop) {
+	    outputArea.value = outputArea.value + '\n'  + " go_back " + pin +" " + drop ;
+		var props = '{"goBack":' + pin +'}'; // {"throttle":102}
+	    send_message(props); 
+		};
+		interpreter.setProperty(scope, 'go_back',
+      interpreter.createNativeFunction(wrapper));
+	  
+	    wrapper = function(pin,drop) {
+	    outputArea.value = outputArea.value + '\n'  + " go_forward " + pin +" " + drop ;
+	    var props = '{"goForward":' + pin +'}'; // {"throttle":102}
+	    send_message(props); 
+		};
+		interpreter.setProperty(scope, 'go_forward',
+      interpreter.createNativeFunction(wrapper));
+	  wrapper = function() {
+	  outputArea.value = outputArea.value + '\n' + "Land";
+	  var props = '{"land":' + 1 +'}'; // {"throttle":102}
+	  send_message(props);
+	};
+	interpreter.setProperty(scope, 'land',
+    interpreter.createNativeFunction(wrapper));
+      wrapper = function() {
+	  outputArea.value = outputArea.value + '\n' + "Take Off";
+	  var props = '{"takeOff":' + 1 +'}'; // {"throttle":102}
+	  send_message(props);
+	};
+	
+	interpreter.setProperty(scope, 'take_off',
+    interpreter.createNativeFunction(wrapper));
+      var wrapper = function(text) {
+        text = text ? text.toString() : '';
+        outputArea.value = outputArea.value + '\n' + text;
+      };
+      var wrapper = function(text) {
+        text = text ? text.toString() : '';
+        outputArea.value = outputArea.value + '\n' + text;
+      };
+      interpreter.setProperty(scope, 'alert',
+          interpreter.createNativeFunction(wrapper));
+      // Add an API function for the prompt() block.
+      var wrapper = function(text) {
+        text = text ? text.toString() : '';
+        return interpreter.createPrimitive(prompt(text));
+      };
+      interpreter.setProperty(scope, 'prompt',
+          interpreter.createNativeFunction(wrapper));
+      // Add an API for the wait block.  See wait_block.js
+      initInterpreterWaitForSeconds(interpreter, scope);
+      // Add an API function for highlighting blocks.
+      var wrapper = function(id) {
+        id = id ? id.toString() : '';
+        return interpreter.createPrimitive(highlightBlock(id));
+      };
+      interpreter.setProperty(scope, 'highlightBlock',
+          interpreter.createNativeFunction(wrapper));
+    }
+    var highlightPause = false;
+    var latestCode = '';
+    function highlightBlock(id) {
+      demoWorkspace.highlightBlock(id);
+      highlightPause = true;
+    }
+    function resetStepUi(clearOutput) {
+      demoWorkspace.highlightBlock(null);
+      highlightPause = false;
+      runButton.disabled = '';
+      if (clearOutput) {
+        outputArea.value = 'Program output:\n=================';
+      }
+    }
+    function generateCodeAndLoadIntoInterpreter() {
+      // Generate JavaScript code and parse it.
+      Blockly.JavaScript.STATEMENT_PREFIX = 'highlightBlock(%1);\n';
+      Blockly.JavaScript.addReservedWords('highlightBlock');
+      latestCode = Blockly.JavaScript.workspaceToCode(demoWorkspace);
+      resetStepUi(true);
+    }
+    function resetInterpreter() {
+      myInterpreter = null;
+      if (runner) {
+        clearTimeout(runner);
+        runner = null;
+      }
+    }
+    function runCode() {
+      if (!myInterpreter) {
+        // First statement of this code.
+        // Clear the program output.
+        resetStepUi(true);
+        runButton.disabled = 'disabled';
+        // And then show generated code in an alert.
+        // In a timeout to allow the outputArea.value to reset first.
+        setTimeout(function() {
+          alert('Ready to execute the following code\n' +
+            '===================================\n' +
+            latestCode);
+          // Begin execution
+          highlightPause = false;
+          myInterpreter = new Interpreter(latestCode, initApi);
+          runner = function() {
+            if (myInterpreter) {
+              var hasMore = myInterpreter.run();
+              if (hasMore) {
+                // Execution is currently blocked by some async call.
+                // Try again later.
+                setTimeout(runner, 10);
+              } else {
+                // Program is complete.
+                outputArea.value += '\n\n<< Program complete >>';
+                resetInterpreter();
+                resetStepUi(false);
+              }
+            }
+          };
+          runner();
+        }, 1);
+        return;
+      }
+    }
+    // Load the interpreter now, and upon future changes.
+    generateCodeAndLoadIntoInterpreter();
+    demoWorkspace.addChangeListener(function(event) {
+      if (!(event instanceof Blockly.Events.Ui)) {
+        // Something changed. Parser needs to be reloaded.
+        resetInterpreter();
+        generateCodeAndLoadIntoInterpreter();
+      }
+    });
+  </script>
+  
+  
+

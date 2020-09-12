@@ -1,0 +1,103 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>HTML Uploader</title>
+    <link href='main.css' rel='stylesheet' type='text/css'>
+    <link rel="apple-touch-icon" sizes="180x180" href="media/logo_144.png">
+    <link rel="icon" type="image/png" sizes="144x144"  href="media/logo_144.png">
+   
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#000000">
+    <meta content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0' name='viewport'>
+</head>
+<body>
+	<center>
+        <header>
+            <h1>Welcome to ESPcopter</h1>
+        </header>
+		 <div>
+			<a href="deneme.html"><img src="media/logo.png" width="325" height="125" title="ESPcopter Logo" alt="Flower"></a>
+        </div>
+		
+		
+		 <header>
+            <h1>SSID and Password</h1>
+        </header>
+    
+	     <div>
+			<form action=""  name="login" onsubmit="start()">
+			<input type="text" name="ssid" placeholder="SSID" required />
+			<input type="password" name="password" placeholder="Password"/>
+			<input  type="submit" value="Change" />
+			
+        </div>
+		
+		 <header>
+            <h1>Calibration</h1>
+        </header>
+		
+         <div>
+			<a href="calibrate.html"><img src="media/calibrate.png" width="200" height="200" title="Calibration" alt="Calibration"></a>
+        </div>
+		
+		  <script>  
+		  
+		  	
+	var wsconnect = 0;
+   
+	
+    var Socket = new WebSocket('ws://' + location.hostname + ':81/', ['arduino']);
+
+	
+	Socket.onopen = function () {
+    Socket.send('Connect ' + new Date());
+	console.log("Websocket Open");
+	wsconnect = 1;
+	};
+	
+	
+	Socket.onerror = function (error) {
+    console.log('WebSocket Error ', error);
+	wsconnect = 0;
+	};
+	Socket.onmessage = function (e) {  
+    console.log("indata: " + e);
+	};
+	Socket.onclose = function(){
+    console.log("Websocket close");
+     wsconnect=0;
+	};	
+	
+	function send_message(msg){
+	 Socket.send(msg);
+	}		
+		  
+		  
+		  
+		  
+    function start() {
+    var ssid= document.forms["login"]["ssid"].value;
+	var password= document.forms["login"]["password"].value;
+	 
+
+	 
+	 var props = '{"ssidPass":["' + ssid+ '","'+ password+'"]}'; 
+
+	
+	  send_message(props); 
+	  
+	  
+	
+	 
+		
+	  console.log( props);
+	
+    }
+		  
+	
+	</script>				 
+	</center>
+</body>
+</html>
+
