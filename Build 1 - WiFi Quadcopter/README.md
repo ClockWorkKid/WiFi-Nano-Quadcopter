@@ -104,6 +104,14 @@ The code has been configured to be using GPIO5 pin on the ESP8266 module as the 
 
 In this manner, the flight controller will power the ESP8266 module when connected to USB/Battery.
 
+### Step 4 (Optional): Connect Beeper/LED
+
+F3EVO brushed flight controller by default does not have an on board beeper. Beepers give important feedback on voltage level, arming-disarming, in flight errors, failsafe etc. Thus you might want to consider connecting a beeper to the flight controller beeper pins. I don't like unnecessary sounds, so I connected an LED to the port instead (use blue LEDs, other colored LEDs have low forward voltage and might easily die without current limiting resistors)
+
+<figure align="center">
+    <img src="images/beeper.jpg" alt="drawing" width="400"/> <figcaption>Beeper LED</figcaption>
+</figure>
+
 ## ESP8266 Configuration
 
 ### Step 1: Setting up Arduino IDE
@@ -135,7 +143,12 @@ The WiFi PPM code uses the esp websockets library.
 
 The WiFi inerface of the quadcopter uses WebSockets protocol for communicating using a browser window.
 
-- The sketch used in this build is originally copied from another <a href="https://github.com/DipanshuShukla/ESP-PPM">github repo</a>. Download the entire <a href="ESP_PPM">sketch folder</a> and open the ESP_PPM.ino file from Arduino IDE. You should be able to upload the original sketch to the ESP Board without problem.
+- The sketch used in this build is originally copied from another <a href="https://github.com/DipanshuShukla/ESP-PPM">github repo</a>. Download the entire <a href="ESP_PPM">sketch folder</a> and open the ESP_PPM.ino file from Arduino IDE. You should be able to upload the original sketch to the ESP Board without problem. You can modify the default WiFi AP name and password from lines 22-23
+
+    ```
+    const char *ssid = "Firefly_Test";
+    const char *password = "123456789";
+    ```
 
 - After uploading, from your smartphone, you will find the hotspot on your phone WiFi. Connect to the hotspot and from smartphone browser, go to url 192.168.4.1
 
@@ -143,13 +156,61 @@ The WiFi inerface of the quadcopter uses WebSockets protocol for communicating u
 
 - A joystick can be connected with the computer to send controls to the ESP8266 module too using firefox browser from PC.
 
+<figure align="center">
+    <img src="images/webpage.png" alt="drawing" width="400"/> <figcaption>Controller Browser Page</figcaption>
+</figure>
+
 ## Flight Controller Configuration
 
+<a href="https://github.com/betaflight/betaflight">Betaflight</a> and <a href="https://github.com/cleanflight/cleanflight">Cleanflight</a> are the two most widely used flight controller firmware and configurators in the realm of RC quads and racing drones. Betaflight is more used these days, althought the two are really similar (Betaflight originally came from cleanflight). I have tested both of them on the model, and ran into a few issues with betaflight. So in this build I will be using only Cleanflight for configuring the micro quad. (The processes explained here should be similar for betaflight too)
 
+### Step 1: Cleanflight Chrome App
 
+Cleanflight runs as an application run from Chrome browser. Google Cleanflight Chrome App and it should take you to the installation page. Add the extension and you should be done. The configurator can be launched from chrome apps.
 
+<figure align="center">
+    <img src="images/cleanflight.png" alt="drawing" width="400"/> <figcaption>Cleanflight Start Page</figcaption>
+</figure>
 
+### Step 2: Install Flight Controller Driver with Zadig
 
+- The brushed controller used in this build has an STM32F3 chip which has a built in port for connecting to USB for firmware flashing. However on Windows machine, a virtual port driver has to be installed for accessing this. Download the <a href="zadig-2.4.exe">Zadig</a> tool.
+
+- To install the bootloader, the Flight Controller board needs to be in Boot mode. Most flight controller boards have a boot button that can be held while connecting to PC, but F3EVO brushed controller has the boot pads open on the board. Do not solder the boot pads together for boot mode, because if you do so, you will need to frequently solder and desolder the pads for changing Flight controller firmware.
+
+    Use something metallic to touch the two boot pads together, and connect the board to PC. If the contact was okay, you should see that only the RED indicator LED is glowing, meaning that the board is in bootloader mode
+    <figure align="center">
+        <img src="images/boot1.gif" alt="drawing" width="400"/> <figcaption>Bootloader Mode</figcaption>
+    </figure>
+    If the blue LED is also flashing, then the board is in configuration mode - disconnect it and try the process again.
+    <figure align="center">
+        <img src="images/boot2.gif" alt="drawing" width="400"/> <figcaption>Configuration Mode</figcaption>
+    </figure>
+
+- With the board in bootloader mode, open Zadig, choose **Options > List All Devices**
+    <figure align="center">
+        <img src="images/zadig.png" alt="drawing" width="400"/> <figcaption>Zadig Driver</figcaption>
+    </figure>
+- Select STM32 Bootloader, WinUSB. Click **replace driver** or **install driver**. It should be done.
+
+### Step 3: Flash Cleanflight Firmware
+
+- Open Cleanflight configurator from Chrome apps, connect the Flight Controller Board in the bootloader mode. When you connect the board, you should see the device is available as **DFU**. Do not try to connect from here.
+    <figure align="center">
+        <img src="images/DFU.png" alt="drawing"/> <figcaption>DFU Mode</figcaption>
+    </figure>
+
+- Go to the firmware flasher tab. The configurator should automatically detect your board. If it doesnt, manually select the board and firmware. At the time of writing, CLFL 2.5.0 was used as flight controller firmware. After that, click on **Load Firmware(Online)** and a hex file will be downloaded. After that, click **Flash Firmware**, it might take some time to flash.
+    <figure align="center">
+        <img src="images/firmware.png" alt="drawing"/> <figcaption>DFU Mode</figcaption>
+    </figure>
+
+After flashing, the configurator will go to the start page, and a serial port will be available for connecting. You can click on connect to start configurating the flight controller now.
+    <figure align="center">
+        <img src="images/configurator.png" alt="drawing"/> <figcaption>Configurator Mode</figcaption>
+    </figure>
+
+If the steps did not make sense, you can watch <a href="https://www.youtube.com/watch?v=Krv-CMSfb_M">this video on flashing using betaflight</a>
 
 ## Finalizing Setup
 
