@@ -1,0 +1,3 @@
+https://github.com/guywithaview/Arduino-Test/blob/master/GY87/GY87.ino
+
+https://howtomechatronics.com/tutorials/arduino/arduino-and-mpu6050-accelerometer-and-gyroscope-tutorial/
