@@ -6,7 +6,6 @@
 #include <WebSocketsServer.h>
 #include <DNSServer.h>
 #include <Hash.h>
-#include "MSP.h"
 
 /* Set these to your desired credentials. */
 
@@ -35,7 +34,6 @@ extern const char index_html[];
 
 unsigned int alivecount=0;
 
-MSP msp;
 
 IPAddress apIP(192, 168, 1, 1);
 DNSServer dnsServer;
@@ -106,19 +104,6 @@ void webSocketEvent(uint8_t num, WStype_t type, uint8_t * payload, size_t length
             ppm[4]=1100; ppm[5]=1100; ppm[6]=1100; ppm[7]=1100;
         }
             break;
-        case WStype_TEXT: {
-            if(payload[0]=='g' && payload[1]=='e' && payload[2]=='t'){
-/*              msp_analog_t analogdata;
-              String senddata="{\"vbat\": ";
-              if (msp.request(MSP_ANALOG, &analogdata, sizeof(analogdata))) {
-                senddata+=String(analogdata.vbat);
-              }
-              else
-                senddata+="0";
-              senddata += "}";
-              webSocket.sendTXT(num, senddata);
-*/            }
-        }
         break;
         case WStype_BIN: {
           ppm[payload[0]]=(payload[1]<<8)+payload[2];
@@ -168,23 +153,11 @@ void setup() {
       if(upload.status == UPLOAD_FILE_START){
         WiFiUDP::stopAll();
         uint32_t maxSketchSpace = (ESP.getFreeSketchSpace() - 0x1000) & 0xFFFFF000;
-        if(!Update.begin(maxSketchSpace)){//start with max available size
- //         Update.printError(Serial);
-        }
       } 
       else if(upload.status == UPLOAD_FILE_WRITE){
         if(Update.write(upload.buf, upload.currentSize) != upload.currentSize){
-//          Update.printError(Serial);
         }
       } 
-      else if(upload.status == UPLOAD_FILE_END){
-        if(Update.end(true)){ //true to set the size to the current progress
- //         Serial.printf("Update Success: %u\nRebooting...\n", upload.totalSize);
-        } else {
-//          Update.printError(Serial);
-        }
- //       Serial.setDebugOutput(false);
-      }
       yield();
     });
  
@@ -202,7 +175,6 @@ void setup() {
   }
   interrupts();
   Serial.begin(115200);
-  msp.begin(Serial);
 }
 
 unsigned long time_now = 0;
