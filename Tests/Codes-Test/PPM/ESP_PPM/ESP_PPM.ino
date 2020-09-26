@@ -5,7 +5,7 @@
 
 #include <WebSocketsServer.h>
 #include <DNSServer.h>
-#include <Hash.h>
+//#include <Hash.h>
 
 /* Set these to your desired credentials. */
 
