@@ -1,0 +1,2 @@
+crazyflie_ros/crazyflie:crazyflie_ros/crazyflie_controller:crazyflie_ros/crazyflie_cpp:crazyflie_ros/crazyflie_demo:crazyflie_ros/crazyflie_description:crazyflie_ros/crazyflie_driver:crazyflie_ros/crazyflie_tools
+-DCATKIN_DEVEL_PREFIX=/media/sayeed/Main/Projects/Firefly/Tests/swarm_ws/devel -DCMAKE_INSTALL_PREFIX=/media/sayeed/Main/Projects/Firefly/Tests/swarm_ws/install -G Unix Makefiles
