@@ -6,7 +6,8 @@ import sim
 import time
 import sys
 import numpy as np
-
+import math
+from scipy.optimize import linear_sum_assignment
 
 class Simulation:
 
@@ -53,14 +54,14 @@ class Quadcopter:
         if err != 0:
             print("Target " + ID + " Initialization failed")
 
-        err, _ = sim.simxGetObjectPosition(self.clientID, self.targetHandle, -1, sim.simx_opmode_streaming)
+        # err, _ = sim.simxGetObjectPosition(self.clientID, self.targetHandle, -1, sim.simx_opmode_streaming)
         print('Initializing position for quadricopter ' + ID)
         err, self.target_pos = sim.simxGetObjectPosition(self.clientID, self.targetHandle, -1,
                                                              sim.simx_opmode_blocking)
+        err = sim.simxSetObjectPosition(self.clientID, self.targetHandle, -1, self.target_pos, sim.simx_opmode_oneshot)
 
     def get_pos(self):
-        err, self.pos = sim.simxGetObjectPosition(self.clientID, self.quadHandle, -1, sim.simx_opmode_buffer)
-        err = sim.simxSetObjectPosition(self.clientID, self.targetHandle, -1, self.target_pos, sim.simx_opmode_oneshot)
+        err, self.pos = sim.simxGetObjectPosition(self.clientID, self.quadHandle, -1, sim.simx_opmode_blocking)
         if err != 0:
             print("Get Position " + self.ID + " failed")
         return self.pos
@@ -77,11 +78,136 @@ class Quadcopter:
         if err != 0:
             print("Set displacement " + self.ID + " failed")
 
-def test_01():
+
+def maneuver_square(quad, timeFactor):
+    step_delay = 2
+    num_quads = len(quad)
+
+    for iteration in range(1):
+
+        for quad_no in range(num_quads):
+            quad[quad_no].displacement(dist=[0.3, 0, 0])
+        time.sleep(step_delay / timeFactor)
+
+        for quad_no in range(num_quads):
+            quad[quad_no].displacement(dist=[0, 0.3, 0])
+        time.sleep(step_delay / timeFactor)
+
+        for quad_no in range(num_quads):
+            quad[quad_no].displacement(dist=[-0.3, 0, 0])
+        time.sleep(step_delay / timeFactor)
+
+        for quad_no in range(num_quads):
+            quad[quad_no].displacement(dist=[0, -0.3, 0])
+        time.sleep(step_delay / timeFactor)
+
+        print("Iteration " + str(iteration) + " complete")
+
+
+def target_matching(target_pos, quad_pos):
+    """
+    Assigns detections to tracked object (both represented as bounding boxes)
+    Returns 3 lists of matches, unmatched_detections and unmatched_trackers
+    """
+    total_pos = len(target_pos)
+    total_quad = len(quad_pos)
+
+    cost_matrix = np.zeros((total_pos, total_quad), dtype=np.float32)
+
+    for m in range(total_pos):
+        for n in range(total_quad):
+            cost_matrix[m, n] = np.linalg.norm(target_pos[m, :] - quad_pos[n, :])
+
+    indices = np.transpose(np.asarray(linear_sum_assignment(cost_matrix)))
+
+    return indices
+
+
+def maneuver_circle_formation(quad, timeFactor):
+    radius = 2
+    steps = 50
+    step_delay = 0.2
+    num_quads = len(quad)
+
+    target_points = np.zeros((num_quads, 2), dtype=float)
+    quad_location = np.zeros_like(target_points)
+
+    angle_step = 2*math.pi/num_quads
+    for i in range(num_quads):
+        theta = angle_step * i
+        target_points[i, :] = (radius * math.cos(theta), radius * math.sin(theta))
+
+    for i in range(num_quads):
+        quad_pos = quad[i].get_pos()
+        quad_location[i, :] = (quad_pos[0], quad_pos[1])
+
+    matching_indices = target_matching(target_points, quad_location)
+    print("Targets matched with nearest agent: ")
+    print(np.transpose(matching_indices[:, 1]))
+
+    # Calculate necessary tracjectory for each quad
+    print("Calculating Trajectories")
+    trajectory_list = np.zeros((num_quads, steps, 2), dtype=float)
+    for target_no in range(num_quads):
+        quad_no = matching_indices[target_no, 1]
+        start_pos = quad_location[quad_no, :]
+        end_pos = target_points[target_no, :]
+        trajectory_list[quad_no, :, 0] = np.linspace(start_pos[0], end_pos[0], steps)
+        trajectory_list[quad_no, :, 1] = np.linspace(start_pos[1], end_pos[1], steps)
+
+    # Smooth transition of all quads in mini steps
+    print("Attempting to move to positions")
+    for step_no in range(steps):
+        for quad_no in range(num_quads):
+            current_target_pos = [trajectory_list[quad_no, step_no, 0],
+                                  trajectory_list[quad_no, step_no, 1],
+                                  quad[quad_no].target_pos[2]]
+            quad[quad_no].set_pos(current_target_pos)
+        time.sleep(step_delay/timeFactor)
+
+    print("Circular formation complete")
+
+
+def maneuver_orbit(quad, timeFactor):
+    steps = 200
+    step_delay = 0.125
+    num_quads = len(quad)
+    step_angle = 2 * math.pi / steps
+
+    radius_list = np.zeros(num_quads, dtype=float)
+    quad_location = np.zeros((num_quads, 2), dtype=float)
+
+    for quad_no in range(num_quads):
+        quad_pos = quad[quad_no].get_pos()
+        quad_location[quad_no, :] = (quad_pos[0], quad_pos[1])
+        radius_list[quad_no] = math.sqrt(quad_pos[0]**2 + quad_pos[1]**2)
+
+    # Smooth transition of all quads in mini steps
+    print("Orbiting around origin")
+    for step_no in range(int(steps/4)):
+        for quad_no in range(num_quads):
+            r = radius_list[quad_no]
+            x, y = quad_location[quad_no, 0], quad_location[quad_no, 1]
+            theta = math.atan2(y, x)
+            theta = theta + step_angle
+            x, y = r * math.cos(theta), r * math.sin(theta)
+            quad_location[quad_no, 0], quad_location[quad_no, 1] = x, y
+
+            current_target_pos = [x, y, quad[quad_no].target_pos[2]]
+            quad[quad_no].set_pos(current_target_pos)
+
+        time.sleep(step_delay/timeFactor)
+
+    print("quarter orbit complete")
+
+
+if __name__ == "__main__":
+
     session = Simulation()
     clientID = session.init()
 
-    quadID = ['', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14']
+    timeFactor = 0.65
+    total_quads = 16
     quad = []
 
     if clientID == -1:
@@ -91,37 +217,22 @@ def test_01():
     else:
         print('Connected to remote API server')
         # initialize the quadcopter objects and connect to simulation handles
-        for i in range(len(quadID)):
+        for i in range(total_quads):
             quad.append(Quadcopter(clientID))
-            quad[i].init(quadID[i])
+            if i == 0:
+                ID = ''
+            else:
+                ID = str(i-1)
+            quad[i].init(ID)
         print("Quadcopters initialized")
 
-        for i in range(5):
-
-            for i in range(len(quadID)):
-                quad[i].displacement(dist=[0.5, 0, 0])
-            time.sleep(10)
-
-            for i in range(len(quadID)):
-                quad[i].displacement(dist=[0, 0.5, 0])
-            time.sleep(10)
-
-            for i in range(len(quadID)):
-                quad[i].displacement(dist=[-0.5, 0, 0])
-            time.sleep(10)
-
-            for i in range(len(quadID)):
-                quad[i].displacement(dist=[0, -0.5, 0])
-            time.sleep(10)
+        maneuver_square(quad, timeFactor)
+        time.sleep(2 / timeFactor)
+        maneuver_orbit(quad, timeFactor)
+        time.sleep(2/timeFactor)
+        maneuver_circle_formation(quad, timeFactor)
+        time.sleep(2/timeFactor)
+        maneuver_orbit(quad, timeFactor)
 
         session.close()
         print("Simulation Terminated")
-
-
-if __name__ == "__main__":
-    test_01()
-
-
-
-
-
