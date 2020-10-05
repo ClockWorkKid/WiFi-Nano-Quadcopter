@@ -88,7 +88,13 @@ void OnDataSent(uint8_t *mac_addr, uint8_t sendStatus) {
 void OnDataRecv(uint8_t * mac, uint8_t *incomingData, uint8_t len) {
   
   memcpy(&commandData, incomingData, sizeof(commandData));
-  
+
+  Serial.print("Msg Source: ");
+  for (int i =0; i < 6; i++){
+    Serial.print(mac[i]);
+    Serial.print(" ");
+  }
+  Serial.println();
   Serial.print("Message Received: ");
   Serial.println(commandData.message);
   Serial.print("Target Position: ");
