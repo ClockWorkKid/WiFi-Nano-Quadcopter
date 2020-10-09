@@ -18,7 +18,7 @@ typedef struct command_message {
 } command_message;
 
 
-bool compare_address(uint8_t* add1, const unsigned char* add2)
+bool compare_address(uint8_t* add1, uint8_t* add2)
 {
   for (int i = 0; i < 6; i++)
     if (add1[i] != add2[i])
@@ -68,7 +68,7 @@ class Drone_Handler {
 };
 
 
-#define num_drones 3
+#define num_drones 2
 Drone_Handler drone[num_drones];
 command_message dummy_command;
 
@@ -137,9 +137,9 @@ void setup() {
   esp_now_register_recv_cb(OnDataRecv);  // recvCB to get recv packer info
 
   
-  drone[0].begin(drone1_address);
-  drone[1].begin(drone2_address);
-  drone[2].begin(drone3_address);
+  drone[0].begin(drone2_address);
+  drone[1].begin(drone3_address);
+  //drone[2].begin(drone3_address);
 }
 
 
